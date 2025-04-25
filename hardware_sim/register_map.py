@@ -48,7 +48,7 @@ class FFtRegisterMap:
         if name not in self.register_map:
             raise ValueError(f"Register {name} does not exist")
         # Check if the value is within the range of the register size
-        if value < 0 or value >= 2 ** (self.register_map[name].size):
+        if value < 0 or value >= 2 ** (self.register_map[name].size * 8):
             raise ValueError(f"Value {value} is out of range for register {name}")
         # Write the value to the register
         if self.register_map[name].access_type == "r":
@@ -65,7 +65,7 @@ class FFtRegisterMap:
         if name not in self.register_map:
             raise ValueError(f"Register {name} does not exist")
         # Read the value from the register
-        return self.register_map[name]["value"]
+        return self.register_map[name].value
     
     def __repr__(self):
         return f"FFtRegisterMap(register_map={self.register_map})"

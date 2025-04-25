@@ -40,12 +40,16 @@ This project simulates a full signal-to-inference pipeline for an AI inference s
 ## 🔄 Control Interface (Software Simulation)
 
                 +-------------------------+
-                |     Register Map       |
+                |     Register Map        |
                 |-------------------------|
-                | 0x00: FFT Size         |
-                | 0x04: Window Type      |
-                | 0x08: Enable Inference |
-                | 0x0C: Inference Result |
+                | FFT_START     0x00 RW   |
+                | FFT_DONE      0x01 R    |
+                | FFT_DATA_IN   0x02 RW   |
+                | FFT_DATA_OUT  0x06 R    |
+                | FFT_CONFIG    0x0A RW   |
+                | FFT_STATUS    0x0E R    |
+                | WINDOW_SIZE   0x0F RW   |
+                | WINDOW_TYPE   0x10 RW   |
                 +-----------+-------------+
                             ^
                             |
@@ -68,6 +72,7 @@ signal-to-inference-arch/
 │   └── cli_controller.py          # CLI to write/read registers, trigger inference
 ├── tests/
 │   └── test_pipeline.py           # Basic pipeline test case
+│   └── test_register_map.py       # Basic register map test case
 ├── README.md                      # Overview + diagram + usage
 └── requirements.txt               # Dependencies: numpy, torch, etc.
 ```

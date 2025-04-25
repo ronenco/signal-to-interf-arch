@@ -39,8 +39,10 @@ class FFtRegisterMap:
             "FFT_DONE":     RegisterEntry("FFT_DONE", 0x01, 1, "r"),     # Done signal
             "FFT_DATA_IN":  RegisterEntry("FFT_DATA_IN", 0x02, 4, "rw"), # Input data
             "FFT_DATA_OUT": RegisterEntry("FFT_DATA_OUT", 0x06, 4, "r"), # Output data
-            "FFT_CONFIG":   RegisterEntry("FFT_CONFIG", 0x0A, 10, "rw"), # Configuration register
-            "FFT_STATUS":   RegisterEntry("FFT_STATUS", 0x14, 1, "r"),   # Status register
+            "FFT_CONFIG":   RegisterEntry("FFT_CONFIG", 0x0A, 4, "rw"), # Configuration register
+            "FFT_STATUS":   RegisterEntry("FFT_STATUS", 0x0E, 1, "r"),   # Status register
+            "WINDOW_SIZE": RegisterEntry("WINDOW_SIZE", 0x0F, 1, "rw"), # Window size
+            "WINDOW_TYPE": RegisterEntry("WINDOW_TYPE", 0x10, 1, "rw"), # Window type
         }
 
     def write_register(self, name, value):
@@ -48,17 +50,18 @@ class FFtRegisterMap:
         if name not in self.register_map:
             raise ValueError(f"Register {name} does not exist")
         # Check if the value is within the range of the register size
-        if value < 0 or value >= 2 ** (self.register_map[name].size * 8):
+        reg = self.register_map[name]
+        if value < 0 or value >= 2 ** (reg.size * 8):
             raise ValueError(f"Value {value} is out of range for register {name}")
         # Write the value to the register
-        if self.register_map[name].access_type == "r":
+        if reg.access_type == "r":
             raise PermissionError(f"Register {name} is read-only")
         
-        self.register_map[name].value = value
+        reg.value = value
         
-        if self.register_map[name].bind is not None:
+        if reg.bind is not None:
             # If the register is bound to another register, update the bound register
-            self.register_map[self.register_map[name]["bind"]].value = value
+            reg.bind.update(value)
     
     def read_register(self, name):
         # Check if the register exists

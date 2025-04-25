@@ -68,6 +68,7 @@ signal-to-inference-arch/
 │   ├── fft_block.py               # Simulated FFT module using numpy
 │   ├── register_map.py            # Simple class for memory-mapped register simulation
 │   └── system_runner.py           # Orchestrates the full pipeline
+│   ├── buffer.py                  # Simulated buffer module using numpy
 ├── interface/
 │   └── cli_controller.py          # CLI to write/read registers, trigger inference
 ├── tests/

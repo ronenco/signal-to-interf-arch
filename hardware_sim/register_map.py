@@ -70,3 +70,5 @@ class FFtRegisterMap:
     def __repr__(self):
         return f"FFtRegisterMap(register_map={self.register_map})"
     
+    def __str__(self):
+        return f"FFtRegisterMap: {self.register_map}"

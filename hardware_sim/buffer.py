@@ -4,7 +4,6 @@ import numpy as np
 
 class Buffer:
     def __init__(self, max_size=None, bufferFullSize=None):
-    def __init__(self, max_size=None, bufferFullSize=None):
         self.buffer = None
         self.max_size = max_size
         self.bufferFullSize = bufferFullSize if bufferFullSize is not None else max_size

@@ -70,6 +70,13 @@ class FFtRegisterMap:
         # Read the value from the register
         return self.register_map[name].value
     
+    def bind_module_to_register(self, module, register_name):
+        # Check if the register exists
+        if register_name not in self.register_map:
+            raise ValueError(f"Register {register_name} does not exist")
+        # Bind the module to the register
+        self.register_map[register_name].bind = module
+    
     def __repr__(self):
         return f"FFtRegisterMap(register_map={self.register_map})"
     

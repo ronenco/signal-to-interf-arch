@@ -9,6 +9,7 @@ import math
 import numpy as np
 class FftBlock:
     def __init__(self):
+        self.done = 0
         self.fft_size = 0
         self.paddingBehaviour = 0
         self.phaseValue = 0
@@ -33,7 +34,18 @@ class FftBlock:
 
         # Set up the FFT block with the given configuration
         self.parse_config(config)
-    
+
+    def bind_input_output(self, input_buffer, output_buffer):
+        """
+        Bind the input and output buffers to the FFT block.
+        """
+        if not isinstance(input_buffer, Buffer):
+            raise ValueError("Input buffer must be a Buffer object")
+        if not isinstance(output_buffer, Buffer):
+            raise ValueError("Output buffer must be a Buffer object")
+        self.input_buffer = input_buffer
+        self.output_buffer = output_buffer
+
     def load_input(self, input_data):
         """
         Load the input data into the FFT block.
@@ -41,7 +53,6 @@ class FftBlock:
         self.input_data = input_data
         # Load the input data into the FFT block
         # This is a placeholder for actual hardware loading code
-        print(f"Loading input data: {input_data}")
     
     def run(self):
         """
@@ -73,10 +84,13 @@ class FftBlock:
             fftOutput = self.phaseShift(fftOutput, -self.phaseValue)
 
         # Save to the output buffer:
-        if self.output_buffer:
+        if self.output_buffer is not None:
             self.output_buffer.writeBuffer(fftOutput)
         else:
             self.output_data = fftOutput
+
+        # Set the done flag
+        self.done = 1
 
     
     def get_output(self):
@@ -88,14 +102,27 @@ class FftBlock:
         else:
             return self.output_data
 
-    def update(self, valued):
+
+    def handle_FFT_START(self, value):
         """
-        Update the FFT block with the given value.
+        Handle the FFT start register.
         """
-        # Update the FFT block with the given value
-        # This is a placeholder for actual hardware update code
-        print(f"Updating FFT block with value: {value}")
-        
+        if value == 1:
+            self.run()
+
+    def handle_FFT_CONFIG(self, value):
+        """
+        Handle the FFT configuration register.
+        """
+        self.configure(value)
+
+    def update(self, name, value):
+        """
+        Update the FFT block with the given register name and value.
+        """
+        print(f"Fallback update for {name} = {value}")
+
+
     def parse_config(self, config):
         """
         Parse the configuration for the FFT block.

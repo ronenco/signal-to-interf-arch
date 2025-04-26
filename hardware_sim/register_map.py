@@ -14,8 +14,6 @@ class RegisterEntry:
             raise ValueError("Address must be an integer")
         if not isinstance(size, int):
             raise ValueError("Size must be an integer")
-        if not isinstance(bind, str) and bind not in [None, "None"]:
-            raise ValueError("Bind is not yet set to be other than None")
         # Enter the register entry:
         self.name = name
         self.address = address
@@ -39,10 +37,10 @@ class FFtRegisterMap:
             "FFT_DONE":     RegisterEntry("FFT_DONE", 0x01, 1, "r"),     # Done signal
             "FFT_DATA_IN":  RegisterEntry("FFT_DATA_IN", 0x02, 4, "rw"), # Input data
             "FFT_DATA_OUT": RegisterEntry("FFT_DATA_OUT", 0x06, 4, "r"), # Output data
-            "FFT_CONFIG":   RegisterEntry("FFT_CONFIG", 0x0A, 4, "rw"), # Configuration register
+            "FFT_CONFIG":   RegisterEntry("FFT_CONFIG", 0x0A, 4, "rw"),  # Configuration register
             "FFT_STATUS":   RegisterEntry("FFT_STATUS", 0x0E, 1, "r"),   # Status register
-            "WINDOW_SIZE": RegisterEntry("WINDOW_SIZE", 0x0F, 1, "rw"), # Window size
-            "WINDOW_TYPE": RegisterEntry("WINDOW_TYPE", 0x10, 1, "rw"), # Window type
+            "WINDOW_SIZE":  RegisterEntry("WINDOW_SIZE", 0x0F, 1, "rw"), # Window size
+            "WINDOW_TYPE":  RegisterEntry("WINDOW_TYPE", 0x10, 1, "rw"), # Window type
         }
 
     def write_register(self, name, value):
@@ -60,8 +58,11 @@ class FFtRegisterMap:
         reg.value = value
         
         if reg.bind is not None:
-            # If the register is bound to another register, update the bound register
-            reg.bind.update(value)
+            if hasattr(reg.bind, f"handle_{name}"):
+                handler = getattr(reg.bind, f"handle_{name}")
+                handler(value)
+            else:
+                reg.bind.update(name, value)
     
     def read_register(self, name):
         # Check if the register exists

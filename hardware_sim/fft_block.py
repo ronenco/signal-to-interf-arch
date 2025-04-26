@@ -6,7 +6,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from hardware_sim.register_map import FFtRegisterMap
 from hardware_sim.buffer import Buffer
 import math
-class FFTBlock:
+import numpy as np
+class FftBlock:
     def __init__(self):
         self.fft_size = 0
         self.paddingBehaviour = 0
@@ -24,10 +25,14 @@ class FFTBlock:
         """
         Configure the FFT block with the given configuration.
         """
+        if not isinstance(config, int):
+            raise ValueError("Configuration must be an integer")
+        if config < 0 or config > 0xFFFFFFFF:
+            raise ValueError("Configuration must be a 32-bit integer")
         self.config = config
+
         # Set up the FFT block with the given configuration
-        # This is a placeholder for actual hardware configuration code
-        print(f"Configuring FFT block with config: {config}")
+        self.parse_config(config)
     
     def load_input(self, input_data):
         """
@@ -43,10 +48,41 @@ class FFTBlock:
         Run the FFT block.
         """
         # Run the FFT block
-        # This is a placeholder for actual hardware running code
-        print("Running FFT block...")
+        # This is a placeholder for actual hardware run code
+        inputBuffer = self.getBufferSamples()
+        if inputBuffer is None:
+            return; # this is when padding behaviour is 1 and input data is too short
+        # Check if the input buffer is the right size:
+        if len(inputBuffer) != self.fft_size:
+            raise ValueError("Input buffer was not the right size")
+        
+        # Perform Windowing:
+        windowOutput = self.windowing(inputBuffer)
+
+        # Perform FFT:
+        fftOutput = self.fft(windowOutput)
+
+        # Perform normalization:
+        if self.normalization:
+            fftOutput = self.normalize(fftOutput)
+
+        # Perform phase shifting:
+        if self.phaseDirection:
+            fftOutput = self.phaseShift(fftOutput, self.phaseValue)
+        else:
+            fftOutput = self.phaseShift(fftOutput, -self.phaseValue)
+
+        # Save to the output buffer:
+        if self.output_buffer:
+            self.output_buffer.writeBuffer(fftOutput)
+        else:
+            self.output_data = fftOutput
+
     
     def get_output(self):
+        """
+        Get the output data from the FFT block.
+        """
         if self.output_buffer:
             return self.output_buffer.getBuffer()
         else:
@@ -115,3 +151,99 @@ class FFTBlock:
             raise ValueError("Invalid reserved value")
         # Save the configuration
         self.config = config
+
+    def getBufferSamples(self):
+        """
+        Get the buffer samples for the FFT block, depending on padding behaviour.
+        """
+        # Padding behaviour:
+        # 0 : No zero padding, error if input is too short
+        # 1 : No zero padding, do nothing if input is too short
+        # 2 : Zero padding, padd from the beginning if input is too short
+        # 3 : Zero padding, padd from the end if input is too short
+        
+        # But first, we get the input data:
+        # if we have a buffer, we need to get the data from it
+        # if we don't have a buffer, we need to get the data from the input data
+        if self.input_buffer is None:
+            bufferIn = self.input_data
+        else:
+            bufferIn = self.input_buffer.getBuffer()
+        
+        if self.paddingBehaviour == 0:
+            if len(bufferIn) < self.fft_size:
+                raise ValueError("Input data is too short")
+
+        elif self.paddingBehaviour == 1:
+            if len(bufferIn) < self.fft_size:
+                return # this is when padding behaviour is 1 and input data is too short
+        elif self.paddingBehaviour == 2:
+            if len(bufferIn) < self.fft_size:
+                # we need to pad the input data with zeros
+                bufferIn = [0] * (self.fft_size - len(bufferIn)) + bufferIn
+
+        elif self.paddingBehaviour == 3:
+            if len(bufferIn) < self.fft_size:
+                # we need to pad the input data with zeros
+                bufferIn = bufferIn + [0] * (self.fft_size - len(bufferIn))
+
+        # Shared between all cases:
+        # we only need the first fft_size values
+        if self.input_buffer is not None:
+            # if we have a buffer, we need to clear it
+            # and write the new data to it
+            self.input_buffer.clear()
+            self.input_buffer.writeBuffer(bufferIn[self.fft_size:])
+        # clean whatever samples are in bufferIn:
+        bufferIn = bufferIn[:self.fft_size]
+        return bufferIn
+
+    def windowing(self, inputBuffer):
+        """
+        Perform windowing on the input buffer.
+        """
+        # Perform windowing on the input buffer
+        # This is a placeholder for actual hardware windowing code
+
+        # For now, we just return the input buffer (which is a rectangle)
+        return inputBuffer
+    
+    def fft(self, inputBuffer):
+        """
+        Perform FFT on the input buffer.
+        """
+        # Perform FFT on the input buffer
+        # This is a placeholder for actual hardware FFT code
+        fftOut = np.fft.fft(inputBuffer)
+        # For now, we just return the input buffer (which is a rectangle)
+        return fftOut
+    
+    def normalize(self, inputBuffer):
+        """
+        Perform normalization on the input buffer.
+        """
+        # Perform normalization on the input buffer
+        # This is a placeholder for actual hardware normalization code
+
+        # For now, we just return the input buffer (which is a rectangle)
+        return inputBuffer/math.sqrt(self.fft_size)
+
+    def phaseShift(self, inputBuffer, phaseValue):
+        """
+        Perform phase shifting on the input buffer.
+        """
+        # Perform phase shifting on the input buffer
+        # This is a placeholder for actual hardware phase shifting code
+
+        # For now, we just return the input buffer (which is a rectangle)
+        return inputBuffer * np.exp(1j * phaseValue)
+    
+    def __repr__(self):
+        return f"FFTBlock(fft_size={self.fft_size}, paddingBehaviour={self.paddingBehaviour}, phaseValue={self.phaseValue}, phaseDirection={self.phaseDirection}, normalization={self.normalization}, reserved={self.reserved})"
+    def __str__(self):
+        return f"FFTBlock: fft_size={self.fft_size}, paddingBehaviour={self.paddingBehaviour}, phaseValue={self.phaseValue}, phaseDirection={self.phaseDirection}, normalization={self.normalization}, reserved={self.reserved}"
+    def __len__(self):
+        if self.input_buffer is not None:
+            return len(self.input_buffer)
+        else:
+            return 0

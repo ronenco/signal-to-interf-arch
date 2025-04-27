@@ -9,7 +9,6 @@ from hardware_sim.register_map import FFtRegisterMap
 from hardware_sim.buffer import Buffer
 from general.helper_functions import create_fft_config, generate_single_tone
 import numpy as np
-import math
 
 def test_full_system_flow():
     """

@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from hardware_sim.register_map import FFtRegisterMap
 from hardware_sim.fft_block import FftBlock
 from hardware_sim.buffer import Buffer
-from general.helper_functions import create_fft_config, generate_single_tone
+from general.helper_functions import create_fft_config, generate_single_tone, get_fft_size
 import math
 import numpy as np
 
@@ -80,12 +80,11 @@ def run_fft_flow(register_map, fft_block):
 
     # 2. Parse fft_size_code from config
     fft_size_code = config_value & 0xF
-    fft_size_lookup = {
-        0:2, 1:4, 2:8, 3:16, 4:32,
-        5:64, 6:128, 7:256, 8:512, 9:1024,
-        10:2048, 11:4096
-    }
-    fft_size = fft_size_lookup.get(fft_size_code)  # default to 64 if unknown
+    fft_size = get_fft_size(fft_size_code)
+    # default to 64 if unknown
+    if fft_size is None:
+        print("Unknown FFT size code. Defaulting to 64.")
+        fft_size = 64
 
     # 3. Generate a signal
     input_signal = generate_single_tone(frequency_bin=5, fft_size=fft_size)

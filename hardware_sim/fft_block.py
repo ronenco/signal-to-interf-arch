@@ -5,8 +5,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 # This is The library for the hardware simulation:
 from hardware_sim.register_map import FFtRegisterMap
 from hardware_sim.buffer import Buffer
+from general.helper_functions import create_fft_config, generate_single_tone, get_fft_size
 import math
 import numpy as np
+
 class FftBlock:
     def __init__(self):
         self.done = 0
@@ -129,29 +131,11 @@ class FftBlock:
         """
         # Parse the configuration for the FFT block
         # The first 4 bits are the fft size index:
-        fft_table = {
-            0: 2,
-            1: 4,
-            2: 8,
-            3: 16,
-            4: 32,
-            5: 64,
-            6: 128,
-            7: 256,
-            8: 512,
-            9: 1024,
-            10: 2048,
-            11: 4096,
-            12: 0,
-            13: 0,
-            14: 0,
-            15: 0,
-        }
         fftSizeIndex = config & 0x0F
         if fftSizeIndex > 11:
             raise ValueError("Invalid FFT size") #TODO: add other options (only zero for input, noise, etc)
         # Set the fft size
-        self.fft_size = fft_table[fftSizeIndex]
+        self.fft_size = get_fft_size(fftSizeIndex)
         # The next 2 bits are the padding information:
         paddingBehaviour = (config >> 4) & 0x03
         self.paddingBehaviour = paddingBehaviour
@@ -199,7 +183,7 @@ class FftBlock:
         
         if self.paddingBehaviour == 0:
             if len(bufferIn) < self.fft_size:
-                raise ValueError("Input data is too short")
+                raise ValueError("Input data is too short, was expecting " + str(self.fft_size) + " samples, got " + str(len(bufferIn)) + " samples")
 
         elif self.paddingBehaviour == 1:
             if len(bufferIn) < self.fft_size:

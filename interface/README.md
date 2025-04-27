@@ -51,9 +51,9 @@ cli_controller(register_map, fft_block)
 
 ## Folder Overview
 
-File                | Purpose                                                               |
---------------------+-----------------------------------------------------------------------|
-cli_controller.py   | Main CLI loop and command parsing logic for the platform simulation.  |
+| File                | Purpose                                                               |
+|---------------------|-----------------------------------------------------------------------|
+| cli_controller.py   | Main CLI loop and command parsing logic for the platform simulation.  |
 
 ## Future Extensions
 

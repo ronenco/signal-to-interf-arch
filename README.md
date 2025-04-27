@@ -64,6 +64,8 @@ This project simulates a full signal-to-inference pipeline for an AI inference s
 signal-to-inference-arch/
 ├── model/
 │   └── rf_classifier.py           # Tiny PyTorch model (starter)
+├── general/
+│   └── helper_functions.py        # Helper functions to reduce code reuse
 ├── hardware_sim/
 │   ├── fft_block.py               # Simulated FFT module using numpy
 │   ├── register_map.py            # Simple class for memory-mapped register simulation

@@ -74,6 +74,10 @@ signal-to-inference-arch/
 ├── interface/
 │   └── cli_controller.py          # CLI to write/read registers, trigger inference
 ├── tests/
+│   └── test_buffer.py             # Basic buffer test case
+│   └── test_cli_controller.py     # Basic CLI controller test case (no user input yet)
+│   └── test_dataset_generator.py  # Basic dataset generator test case
+│   └── test_fft_block.py          # Basic FFT block test case
 │   └── test_pipeline.py           # Basic pipeline test case
 │   └── test_register_map.py       # Basic register map test case
 ├── README.md                      # Overview + diagram + usage

@@ -53,3 +53,34 @@ def generate_single_tone(frequency_bin, fft_size):
     n = np.arange(fft_size)
     tone = np.exp(1j * 2 * np.pi * frequency_bin * n / fft_size)
     return tone
+
+def generate_mixed_tones(fft_size, possible_tones=2):
+    """
+    Generate a mixed-tone signal with a random number of tones.
+    """
+    # Randomly choose the number of tones
+    num_tones = np.random.choice([tones for tones in range(1,possible_tones+1)])
+    total_signal = np.zeros(fft_size, dtype=complex)
+    used_bins = set()
+
+    for _ in range(num_tones):
+        available_bins = [b for b in range(1, fft_size//2) if b not in used_bins]
+        if not available_bins:
+            break  # No available bins left
+        random_bin = np.random.choice(available_bins)
+        used_bins.add(random_bin)
+        
+        tone = generate_single_tone(random_bin, fft_size)  # reuse your helper function!
+        total_signal += tone
+
+    return total_signal, num_tones
+
+def generate_noise(fft_size):
+    """
+    Generate complex Gaussian noise.
+    """
+    # Create complex Gaussian noise (mean=0, variance=1)
+    noise_real = np.random.randn(fft_size)
+    noise_imag = np.random.randn(fft_size)
+    noise = (noise_real + 1j * noise_imag) / np.sqrt(2)  # Normalize for unit average power
+    return noise

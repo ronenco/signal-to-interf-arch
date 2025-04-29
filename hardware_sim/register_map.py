@@ -83,3 +83,13 @@ class FFtRegisterMap:
     
     def __str__(self):
         return f"FFtRegisterMap: {self.register_map}"
+
+def ClassifierRegMap():
+    """
+    This function returns the register map for the Classifier block.
+    """
+    self.register_map = {
+        "CLASSIFY_TRIGGER": RegisterEntry("CLASSIFY_TRIGGER", 0x20, 1, "rw"), 
+        "CLASSIFY_RESULT":  RegisterEntry("CLASSIFY_RESULT", 0x21, 1, "r"),
+        "CLASSIFY_DONE":    RegisterEntry("CLASSIFY_DONE", 0x22, 1, "r"),
+    }

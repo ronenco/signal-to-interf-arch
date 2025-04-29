@@ -62,8 +62,6 @@ This project simulates a full signal-to-inference pipeline for an AI inference s
 
 ```
 signal-to-inference-arch/
-├── model/
-│   └── rf_classifier.py           # Tiny PyTorch model (starter)
 ├── general/
 │   └── helper_functions.py        # Helper functions to reduce code reuse
 ├── hardware_sim/
@@ -73,6 +71,12 @@ signal-to-inference-arch/
 │   ├── buffer.py                  # Simulated buffer module using numpy
 ├── interface/
 │   └── cli_controller.py          # CLI to write/read registers, trigger inference
+│   └── README.md                  # CLI commands overview and explnations
+├── ml_module/
+│   └── dataset_generator.py       # Dataset generator (simple)
+│   └── train_classifier.py        # Classifier training
+├── model/
+│   └── rf_classifier.py           # Tiny PyTorch model (starter)
 ├── tests/
 │   └── test_buffer.py             # Basic buffer test case
 │   └── test_cli_controller.py     # Basic CLI controller test case (no user input yet)

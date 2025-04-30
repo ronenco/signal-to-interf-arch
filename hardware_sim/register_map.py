@@ -84,9 +84,9 @@ class BaseRegisterMap:
         self.register_map[register_name].bind = module
 
     def update(self):
-        for module in set(self.bound_modules.values()):
-            if hasattr(module, "update"):
-                module.update()
+        for reg in self.register_map.values():
+            if reg.bind and hasattr(reg.bind, "update"):
+                reg.bind.update()
 
     def get_register(self, name):
         return self.register_map.get(name)
@@ -132,7 +132,7 @@ class ClassifierRegMap(BaseRegisterMap):
         }
 
     def __repr__(self):
-        return f"FFtRegisterMap(register_map={self.register_map})"
+        return f"ClassifierRegMap(register_map={self.register_map})"
     
     def __str__(self):
-        return f"FFtRegisterMap: {self.register_map}"
+        return f"ClassifierRegMap: {self.register_map}"

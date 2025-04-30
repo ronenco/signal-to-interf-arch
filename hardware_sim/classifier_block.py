@@ -8,6 +8,16 @@ from hardware_sim.buffer import Buffer
 
 class ClassifierBlock:
     def __init__(self, model_path="ml_module/trained_rf_classifier.joblib"):
+        self.model_path = model_path
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found: {model_path}")
+        if not model_path.endswith('.joblib'):
+            raise ValueError("Model file must be a .joblib file")
+        if not os.path.isfile(model_path):
+            raise ValueError("Model path must be a file")
+        if not os.access(model_path, os.R_OK):
+            raise PermissionError(f"Model file is not readable: {model_path}")
+        # Load the trained model
         self.model = joblib.load(model_path)
         self.input_buffer = None
         self.output_registers = {}
@@ -31,16 +41,16 @@ class ClassifierBlock:
     def handle_CLASSIFY_TRIGGER(self, value):
         if value == 1:
             self.triggered = True
+            self.run()
 
-    def update(self):
+    def run(self):
         if self.triggered and self.input_buffer is not None:
-            signal = self.input_buffer.getBuffer()
+            fft_result = self.input_buffer.getBuffer()
 
-            if signal is None or len(signal) == 0:
+            if fft_result is None or len(fft_result) == 0:
                 print("ClassifierBlock: Input buffer is empty.")
                 return
 
-            fft_result = np.fft.fft(signal)
             features = np.abs(fft_result).reshape(1, -1)
             label = self.model.predict(features)[0]
 
@@ -51,7 +61,13 @@ class ClassifierBlock:
 
             self.triggered = False
 
+    def update(self):
+        if self.triggered:
+            self.run()
+
+
     def __str__(self):
-        return f"<ClassifierBlock (latency={self.latency_cycles} cycles)>"
+        return f"<ClassifierBlock (latency={self.latency_cycles} cycles, triggered={self.triggered}, model_path={self.model_path})>"
 
-
+    def __repr__(self):
+        return self.__str__()

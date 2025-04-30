@@ -28,22 +28,31 @@ class RegisterEntry:
     def __str__(self):
         return f"RegisterEntry: {self.name} at address {self.address} with size {self.size} and access type {self.access_type}, bund {self.bind}"
 
-# This is the FftRegisterMap class:
-class FFtRegisterMap:
+## This is the base class for the register map:
+# This class is used to read and write registers, and to bind modules to registers.
+# It is a base class and should be inherited by other register maps.
+class BaseRegisterMap:
     def __init__(self):
-        # Register map
-        self.register_map = {
-            "FFT_START":    RegisterEntry("FFT_START", 0x00, 1, "rw"),   # Start the FFT
-            "FFT_DONE":     RegisterEntry("FFT_DONE", 0x01, 1, "r"),     # Done signal
-            "FFT_DATA_IN":  RegisterEntry("FFT_DATA_IN", 0x02, 4, "rw"), # Input data
-            "FFT_DATA_OUT": RegisterEntry("FFT_DATA_OUT", 0x06, 4, "r"), # Output data
-            "FFT_CONFIG":   RegisterEntry("FFT_CONFIG", 0x0A, 4, "rw"),  # Configuration register
-            "FFT_STATUS":   RegisterEntry("FFT_STATUS", 0x0E, 1, "r"),   # Status register
-            "WINDOW_SIZE":  RegisterEntry("WINDOW_SIZE", 0x0F, 1, "rw"), # Window size
-            "WINDOW_TYPE":  RegisterEntry("WINDOW_TYPE", 0x10, 1, "rw"), # Window type
-        }
+        self.register_map = {}
+        self.bound_modules = {}
+
+    def read_register(self, name):
+        """
+        Read a register value.
+        """
+        # Check if the register exists
+        if name not in self.register_map:
+            raise ValueError(f"Register {name} does not exist")
+        # Check if the register is readable
+        if self.register_map[name].access_type == "w":
+            raise PermissionError(f"Register {name} is write-only")
+        # Read the value from the register
+        return self.register_map[name].value
 
     def write_register(self, name, value):
+        """
+        Write a value to a register.
+        """
         # Check if the register exists
         if name not in self.register_map:
             raise ValueError(f"Register {name} does not exist")
@@ -63,33 +72,67 @@ class FFtRegisterMap:
                 handler(value)
             else:
                 reg.bind.update(name, value)
-    
-    def read_register(self, name):
-        # Check if the register exists
-        if name not in self.register_map:
-            raise ValueError(f"Register {name} does not exist")
-        # Read the value from the register
-        return self.register_map[name].value
-    
+
     def bind_module_to_register(self, module, register_name):
+        """
+        Bind a module to a register.
+        """
         # Check if the register exists
         if register_name not in self.register_map:
             raise ValueError(f"Register {register_name} does not exist")
         # Bind the module to the register
         self.register_map[register_name].bind = module
-    
+
+    def update(self):
+        for module in set(self.bound_modules.values()):
+            if hasattr(module, "update"):
+                module.update()
+
+    def get_register(self, name):
+        return self.register_map.get(name)
+
+# This is the FftRegisterMap class:
+class FFtRegisterMap(BaseRegisterMap):
+    def __init__(self):
+        """
+        This is the FftRegisterMap class:
+        """
+        super().__init__() # Initialize the base class
+        # Initialize the register map:
+        # Register map
+        self.register_map = {
+            "FFT_START":    RegisterEntry("FFT_START", 0x00, 1, "rw"),   # Start the FFT
+            "FFT_DONE":     RegisterEntry("FFT_DONE", 0x01, 1, "r"),     # Done signal
+            "FFT_DATA_IN":  RegisterEntry("FFT_DATA_IN", 0x02, 4, "rw"), # Input data
+            "FFT_DATA_OUT": RegisterEntry("FFT_DATA_OUT", 0x06, 4, "r"), # Output data
+            "FFT_CONFIG":   RegisterEntry("FFT_CONFIG", 0x0A, 4, "rw"),  # Configuration register
+            "FFT_STATUS":   RegisterEntry("FFT_STATUS", 0x0E, 1, "r"),   # Status register
+            "WINDOW_SIZE":  RegisterEntry("WINDOW_SIZE", 0x0F, 1, "rw"), # Window size
+            "WINDOW_TYPE":  RegisterEntry("WINDOW_TYPE", 0x10, 1, "rw"), # Window type
+        }
+
     def __repr__(self):
         return f"FFtRegisterMap(register_map={self.register_map})"
     
     def __str__(self):
         return f"FFtRegisterMap: {self.register_map}"
 
-def ClassifierRegMap():
-    """
-    This function returns the register map for the Classifier block.
-    """
-    self.register_map = {
-        "CLASSIFY_TRIGGER": RegisterEntry("CLASSIFY_TRIGGER", 0x20, 1, "rw"), 
-        "CLASSIFY_RESULT":  RegisterEntry("CLASSIFY_RESULT", 0x21, 1, "r"),
-        "CLASSIFY_DONE":    RegisterEntry("CLASSIFY_DONE", 0x22, 1, "r"),
-    }
+class ClassifierRegMap(BaseRegisterMap):
+    def __init__(self):
+        """
+        This is the ClassifierRegMap class:
+        """
+        super().__init__()
+        # Initialize the register map:
+        # Register map
+        self.register_map = {
+            "CLASSIFY_TRIGGER": RegisterEntry("CLASSIFY_TRIGGER", 0x20, 1, "rw"), 
+            "CLASSIFY_RESULT":  RegisterEntry("CLASSIFY_RESULT", 0x21, 1, "r"),
+            "CLASSIFY_DONE":    RegisterEntry("CLASSIFY_DONE", 0x22, 1, "r"),
+        }
+
+    def __repr__(self):
+        return f"FFtRegisterMap(register_map={self.register_map})"
+    
+    def __str__(self):
+        return f"FFtRegisterMap: {self.register_map}"

@@ -132,6 +132,7 @@ class FftBlock:
         # Parse the configuration for the FFT block
         # The first 4 bits are the fft size index:
         fftSizeIndex = config & 0x0F
+        print("FFT size index: ", fftSizeIndex)
         if fftSizeIndex > 11:
             raise ValueError("Invalid FFT size") #TODO: add other options (only zero for input, noise, etc)
         # Set the fft size

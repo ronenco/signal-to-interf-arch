@@ -132,6 +132,7 @@ class FftBlock:
         # Parse the configuration for the FFT block
         # The first 4 bits are the fft size index:
         fftSizeIndex = config & 0x0F
+        print("FFT size index: ", fftSizeIndex)
         if fftSizeIndex > 11:
             raise ValueError("Invalid FFT size") #TODO: add other options (only zero for input, noise, etc)
         # Set the fft size
@@ -248,6 +249,12 @@ class FftBlock:
 
         # For now, we just return the input buffer (which is a rectangle)
         return inputBuffer * np.exp(1j * phaseValue)
+    
+    def getFFTSize(self):
+        """
+        Get the FFT size.
+        """
+        return self.fft_size
     
     def __repr__(self):
         return f"FFTBlock(fft_size={self.fft_size}, paddingBehaviour={self.paddingBehaviour}, phaseValue={self.phaseValue}, phaseDirection={self.phaseDirection}, normalization={self.normalization}, reserved={self.reserved})"

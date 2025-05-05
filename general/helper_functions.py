@@ -7,22 +7,30 @@ def get_fft_size_code(fft_size):
     """
     Get the FFT size code based on the FFT size.
     """
-    if fft_size == 64:
+    if fft_size == 2:
         return 0
-    elif fft_size == 128:
+    elif fft_size == 4:
         return 1
-    elif fft_size == 256:
+    elif fft_size == 8:
         return 2
-    elif fft_size == 512:
+    elif fft_size == 16:
         return 3
-    elif fft_size == 1024:
+    elif fft_size == 32:
         return 4
-    elif fft_size == 2048:
+    elif fft_size == 64:
         return 5
-    elif fft_size == 4096:
+    elif fft_size == 128:
         return 6
-    elif fft_size == 8192:
+    elif fft_size == 256:
         return 7
+    elif fft_size == 512:
+        return 8
+    elif fft_size == 1024:
+        return 9
+    elif fft_size == 2048:
+        return 10
+    elif fft_size == 4096:
+        return 11
     else:
         raise ValueError("Invalid FFT size. Supported sizes are: 64, 128, 256, 512, 1024, 2048, 4096, and 8192.")
 

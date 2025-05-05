@@ -16,8 +16,8 @@ import joblib
 
 def main():
     # Parameters:
-    num_samples = 1000
-    fft_size = 128
+    num_samples = 40000
+    fft_size = 64
     # Generate Dataset
     X, y = generate_dataset(num_samples, fft_size)
 
@@ -37,7 +37,7 @@ def main():
     print(f"\nAccuracy: {accuracy_score(y_test, y_pred)*100:.2f}%")
 
     # Save the model
-    model_path = os.path.join(os.path.dirname(__file__), 'random_forest_model.pkl')
+    model_path = os.path.join(os.path.dirname(__file__), 'trained_rf_classifier.joblib')
     joblib.dump(clf, model_path)
     print(f"Model saved to {model_path}")
 

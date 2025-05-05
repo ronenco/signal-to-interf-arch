@@ -22,6 +22,18 @@ class RegisterEntry:
         self.bind = bind
         self.value = 0 # Default value
 
+    def read(self):
+        """
+        Read the value of the register.
+        """
+        return self.value
+    
+    def write(self, value):
+        """
+        Write a value to the register.
+        """
+        self.value = value
+
     def __repr__(self):
         return f"RegisterEntry(name={self.name}, address={self.address}, size={self.size}, access_type={self.access_type}, bind={self.bind})"
 
@@ -126,9 +138,10 @@ class ClassifierRegMap(BaseRegisterMap):
         # Initialize the register map:
         # Register map
         self.register_map = {
-            "CLASSIFY_TRIGGER": RegisterEntry("CLASSIFY_TRIGGER", 0x20, 1, "rw"), 
-            "CLASSIFY_RESULT":  RegisterEntry("CLASSIFY_RESULT", 0x21, 1, "r"),
-            "CLASSIFY_DONE":    RegisterEntry("CLASSIFY_DONE", 0x22, 1, "r"),
+            "CLASSIFY_TRIGGER":      RegisterEntry("CLASSIFY_TRIGGER", 0x20, 1, "rw"), 
+            "CLASSIFY_RESULT":       RegisterEntry("CLASSIFY_RESULT", 0x21, 1, "r"),
+            "CLASSIFY_DONE":         RegisterEntry("CLASSIFY_DONE", 0x22, 1, "r"), 
+            "CLASSIFY_MODEL_SELECT": RegisterEntry("CLASSIFY_MODEL_SELECT", 0x23, 1, "rw"), # Model select
         }
 
     def __repr__(self):

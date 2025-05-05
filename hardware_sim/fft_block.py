@@ -250,6 +250,12 @@ class FftBlock:
         # For now, we just return the input buffer (which is a rectangle)
         return inputBuffer * np.exp(1j * phaseValue)
     
+    def getFFTSize(self):
+        """
+        Get the FFT size.
+        """
+        return self.fft_size
+    
     def __repr__(self):
         return f"FFTBlock(fft_size={self.fft_size}, paddingBehaviour={self.paddingBehaviour}, phaseValue={self.phaseValue}, phaseDirection={self.phaseDirection}, normalization={self.normalization}, reserved={self.reserved})"
     def __str__(self):

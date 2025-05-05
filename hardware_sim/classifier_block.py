@@ -42,6 +42,31 @@ class ClassifierBlock:
         if value == 1:
             self.triggered = True
             self.run()
+        self.triggered = False
+    
+    def handle_CLASSIFY_MODEL_SELECT(self, value):
+        model_paths = {
+            0: "ml_module/model_rf_classifier.joblib",
+            1: "ml_module/model_rf_snr_augmented.joblib",
+            2: "ml_module/model_rf_fft128.joblib",
+            3: "ml_module/model_rf_fft512.joblib"
+        }
+        selected_path = model_paths.get(value)
+        if selected_path:
+            if not os.path.exists(selected_path):
+                raise FileNotFoundError(f"Model file not found: {selected_path}")
+            if not os.path.isfile(selected_path):
+                raise ValueError("Model path must be a file")
+            if not os.access(selected_path, os.R_OK):
+                raise PermissionError(f"Model file is not readable: {selected_path}")
+            self.model = joblib.load(selected_path)
+            if self.output_registers.get('done'):
+                self.output_registers['done'].write(0)
+        else:
+            raise ValueError(f"Invalid model selection {value}. Valid options are: {list(model_paths.keys())}")
+
+
+
 
     def run(self):
         if self.triggered and self.input_buffer is not None:
@@ -54,10 +79,11 @@ class ClassifierBlock:
             features = np.abs(fft_result).reshape(1, -1)
             label = self.model.predict(features)[0]
 
+            # Write to the registers if initiated using the register's object write command:
             if self.output_registers.get('result'):
-                self.output_registers['result']['value'] = label
+                self.output_registers['result'].write(label) # this is direct access to register so it bypasses read only condition
             if self.output_registers.get('done'):
-                self.output_registers['done']['value'] = 1
+                self.output_registers['done'].write(1) #this is direct access to register so it bypasses read only condition
 
             self.triggered = False
 

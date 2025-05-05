@@ -26,12 +26,14 @@ class RegisterEntry:
         """
         Read the value of the register.
         """
+        # NOTE - This is a direct HW access to the register, therefore can't be accessed via CLI but only via the HW Module
         return self.value
     
     def write(self, value):
         """
         Write a value to the register.
         """
+        # NOTE - This is a direct HW access to the register, therefore can't be accessed via CLI but only via the HW Module
         self.value = value
 
     def __repr__(self):

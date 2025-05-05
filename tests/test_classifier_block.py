@@ -89,6 +89,7 @@ fft_block_reg_map.write_register("FFT_START", 1)
 classifier_block_reg_map.write_register("CLASSIFY_TRIGGER", 1)
 # Now we check the result:
 result = classifier_block_reg_map.get_register("CLASSIFY_RESULT").read()
+assert isinstance(result, (int, np.integer)), "Prediction should be an integer label"
 print(f"Classifier result: {result}")
 # The result should be 0, since we have a single tone
 # Now we check the done flag:
